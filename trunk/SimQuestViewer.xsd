@@ -1,0 +1,1932 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 sp1 (http://www.altova.com) by Peter Visser (Controllab Products B.V.) -->
+<!-- edited with XML Spy v4.3 U (http://www.xmlspy.com) by Oom Henk (Beta Testing) -->
+<!--1-Feb-2008 vsr-->
+<!--version 1.000-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<xs:simpleType name="variableName">
+		<xs:annotation>
+			<xs:documentation>unique name of a Variable used as ref in variable</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="arithmeticType">
+		<xs:annotation>
+			<xs:documentation>real, integer, boolean, string</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="real"/>
+			<xs:enumeration value="integer"/>
+			<xs:enumeration value="boolean"/>
+			<xs:enumeration value="string"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="application">
+		<xs:annotation>
+			<xs:documentation>part-of hierarchy of the application</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="header" minOccurs="0"/>
+				<xs:element name="showTopicBrowser" type="xs:boolean" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>default = false
+true shows a tree of all topics and their interfaces</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="topics" minOccurs="0"/>
+				<xs:element name="originalApplication" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>contains the whole application in the original format of the creator tool</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="variable">
+		<xs:annotation>
+			<xs:documentation>reference to unique model variable name</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="variableName"/>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="literal" type="xs:string" default="0" nillable="false">
+		<xs:annotation>
+			<xs:documentation>1, true, 3.4, "halo"</xs:documentation>
+			<xs:documentation>1, true, 3.4, "halo"</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="special" type="variableName">
+		<xs:annotation>
+			<xs:documentation>simulation kernel variables
+
+time, startTime, finishTime, stepSize
+
+simulator_NAME_state
+simulator_NAME_action
+
+simulator_NAME_slowdown</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="equation">
+		<xs:annotation>
+			<xs:documentation>variable := expression</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="lefthandside"/>
+				<xs:group ref="expression"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="conditional">
+		<xs:annotation>
+			<xs:documentation>if condition then expression else expression</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="3" maxOccurs="3">
+				<xs:group ref="expression"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="function">
+		<xs:annotation>
+			<xs:documentation>fucntion ({expression})
+
+kind nullary = random
+kind unary = sin, cos, tan, arcsin, arccos, arctan, sinh, cosh, tanh, arcsinh, arccosh, arctanh, abs, round, sign, sqr, sqrt, trunc, floor, ceil, log, log2, log10, exp, exp2, exp10
+kind binary = atan2
+kind ternary = limit
+kind multary = 
+ </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:group ref="expression"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="rows" type="xs:nonNegativeInteger">
+				<xs:annotation>
+					<xs:documentation>The number of rows if the function is a matrix function or vector function and has no childs to determine size
+if 0 row size is variable</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="columns" type="xs:nonNegativeInteger">
+				<xs:annotation>
+					<xs:documentation>The number of columns if the function is a matrix function (not set for vector functions) and has no childs to determine size
+if 0 column size is variable</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="kind" use="optional" default="unary">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="nullary"/>
+						<xs:enumeration value="unary"/>
+						<xs:enumeration value="binary"/>
+						<xs:enumeration value="ternary"/>
+						<xs:enumeration value="multary"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="operator">
+		<xs:annotation>
+			<xs:documentation>[expression] operator [expression] etc
+
+kind prefix = +. -. not.
+kind outfix = (.) |.| ||.||
+kind postfix = .!
+kind infix = + - * / ^ mod div less lessequal greater greaterequal equalequal lessgreater and or xor
+.* ./ .^</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="2">
+				<xs:group ref="expression"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="kind" use="optional" default="infix">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="infix"/>
+						<xs:enumeration value="prefix"/>
+						<xs:enumeration value="outfix"/>
+						<xs:enumeration value="postfix"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="relation">
+		<xs:annotation>
+			<xs:documentation>expression = expression</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="2" maxOccurs="2">
+				<xs:group ref="expression"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="code">
+		<xs:annotation>
+			<xs:documentation>codeblock</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:choice>
+					<xs:element ref="equation">
+						<xs:annotation>
+							<xs:documentation>variable := expression</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:group ref="statement"/>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="if">
+		<xs:annotation>
+			<xs:documentation>if expression 
+then code 
+else code</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="expression"/>
+				<xs:element ref="code">
+					<xs:annotation>
+						<xs:documentation>then</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="code" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>else</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="for">
+		<xs:annotation>
+			<xs:documentation>for variable = expression 
+to expression by expression do code </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="variable">
+					<xs:annotation>
+						<xs:documentation>"model variable name"</xs:documentation>
+						<xs:documentation>"model variable name"</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:group ref="expression"/>
+				<xs:group ref="expression"/>
+				<xs:group ref="expression"/>
+				<xs:element ref="code">
+					<xs:annotation>
+						<xs:documentation>do</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="while">
+		<xs:annotation>
+			<xs:documentation>while condition 
+do code</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="expression"/>
+				<xs:element ref="code">
+					<xs:annotation>
+						<xs:documentation>do</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="switch">
+		<xs:annotation>
+			<xs:documentation>switch expression 
+case literal do code
+case literal do code </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="expression"/>
+				<xs:sequence maxOccurs="unbounded">
+					<xs:element ref="literal">
+						<xs:annotation>
+							<xs:documentation>case</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element ref="code">
+						<xs:annotation>
+							<xs:documentation>do</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="repeat">
+		<xs:annotation>
+			<xs:documentation>repeat code until condition</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="code">
+					<xs:annotation>
+						<xs:documentation>repeat</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:group ref="expression"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="simulation">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="method" default="static" nillable="false">
+					<xs:annotation>
+						<xs:documentation>static (default) 
+discrete
+euler
+adamsbashfort2
+rungekutta2
+rungekutta4
+rungekutta45</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="static"/>
+							<xs:enumeration value="discrete"/>
+							<xs:enumeration value="euler"/>
+							<xs:enumeration value="adamsbashfort2"/>
+							<xs:enumeration value="rungekutta2"/>
+							<xs:enumeration value="rungekutta4"/>
+							<xs:enumeration value="rungekuttafehlberg"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="startTime" type="xs:double" default="0" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>0 (default)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="finishTime" type="xs:double" minOccurs="0"/>
+				<xs:element name="stepSize" type="xs:double" default="0.01" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>0.01 (default)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="tolerance" type="xs:double" minOccurs="0"/>
+				<xs:element name="stopCondition" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:group ref="expression"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="events" type="xs:string" minOccurs="0"/>
+				<xs:element name="outputAfterTime" type="xs:double" minOccurs="0"/>
+				<xs:element name="sleepTime" type="xs:double" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="variables">
+		<xs:annotation>
+			<xs:documentation>all model variables
+also internal onces</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="modelVariable"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="computationalModel">
+		<xs:annotation>
+			<xs:documentation>all model code, that is a collection of assignments and statements (already sorted and reshaped)</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="code"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="topics">
+		<xs:annotation>
+			<xs:documentation>SimQuest topics
+context levels</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="topic"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="model">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="header" minOccurs="0"/>
+				<xs:element ref="variables" minOccurs="0"/>
+				<xs:element ref="computationalModel" minOccurs="0"/>
+				<xs:element name="originalModel" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>contains the model in the original format of the creator tool</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element ref="simulation" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="topic">
+		<xs:annotation>
+			<xs:documentation>SimQuest 
+context level</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="header" minOccurs="0"/>
+				<xs:element ref="model"/>
+				<xs:element name="interfaces" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded">
+							<xs:element ref="interface"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="assignments" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded">
+							<xs:element ref="assignment"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="interface">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="header" minOccurs="0"/>
+				<xs:element ref="placement"/>
+				<xs:element name="colors" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="foreground" type="color" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>default OS</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="background" type="color" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>default OS</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="additional1" type="color" minOccurs="0"/>
+							<xs:element name="additional2" type="color" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="widgets" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded">
+							<xs:element ref="widget"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="assignment">
+		<xs:annotation>
+			<xs:documentation>to be defined</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="header"/>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="modelVariable">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="name"/>
+				<xs:element name="aliases" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>names of other variables that share the same value</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence maxOccurs="unbounded">
+							<xs:element name="alias" type="variableName"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="externalName" type="xs:string" nillable="false" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>a variable without external GUI name is considered internal</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="description" type="xs:string" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>further description of  the variable</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="kind" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>input | variable (default) | state | rate | output | constant | special | time</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="input"/>
+							<xs:enumeration value="variable"/>
+							<xs:enumeration value="state"/>
+							<xs:enumeration value="rate"/>
+							<xs:enumeration value="output"/>
+							<xs:enumeration value="constant"/>
+							<xs:enumeration value="special"/>
+							<xs:enumeration value="time"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="type" type="arithmeticType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>real (default) | integer | boolean | string</xs:documentation>
+						<xs:documentation>real (default) | integer | boolean | string</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="size" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>default = scalar
+NOTE: from version 1,1</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="rows" type="xs:int">
+								<xs:annotation>
+									<xs:documentation>Specify for matrices and vectors. if specified as 0 the row size may change (is not fixed)</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="columns" type="xs:int">
+								<xs:annotation>
+									<xs:documentation>specifiy for matrices, for vectors the columns must be set to 1. if specified as 0 the column size may change (is not fixed)</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="pair" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>name of the state of rate it this variable pairs with</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="value" type="xs:string" nillable="false" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>0 (default)
+
+Values are specified as strings and parsed for the specific types
+true, false = boolean
+2 = integer
+12.0 = double
+text = string
+1,2.5;2,4 = double matrix. semicolons to end a row, colon between elements, dot for doubles.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="range" nillable="false" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>-inf...inf (default)</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="minimum" type="xs:string" minOccurs="0"/>
+							<xs:element name="maximum" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="physical" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="unit" type="xs:string" nillable="false"/>
+							<xs:element name="quantity" type="xs:string"/>
+							<xs:element name="domain" type="xs:string" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="header">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="name"/>
+				<xs:element name="format" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>1.0 = initial scalar version 
+1.1 = version with matrices</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="creator" type="xs:string" minOccurs="0"/>
+				<xs:element name="description" type="xs:string" minOccurs="0"/>
+				<xs:element name="timestamp" type="xs:dateTime" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:group name="expression">
+		<xs:annotation>
+			<xs:documentation>expression</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:group ref="atomic"/>
+			<xs:group ref="compound"/>
+		</xs:choice>
+	</xs:group>
+	<xs:group name="atomic">
+		<xs:annotation>
+			<xs:documentation>leaf expression</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element ref="literal"/>
+			<xs:element ref="variable">
+				<xs:annotation>
+					<xs:documentation>"model variable name"</xs:documentation>
+					<xs:documentation>"model variable name"</xs:documentation>
+					<xs:documentation>"model variable name"</xs:documentation>
+					<xs:documentation>"model variable name"</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="special"/>
+		</xs:choice>
+	</xs:group>
+	<xs:group name="compound">
+		<xs:choice>
+			<xs:element ref="code"/>
+			<xs:element ref="relation"/>
+			<xs:element ref="operator"/>
+			<xs:element ref="index">
+				<xs:annotation>
+					<xs:documentation>index operator  (row,column)
+variable (expr, expr)
+A(2,3)
+NOTE: from version 1,1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="matrix">
+				<xs:annotation>
+					<xs:documentation>matrix operator [{expr}]
+A = [2, 3; 4, 5]
+NOTE: from version 1,1
+NOTE: The expression may *not* contain another matrix!</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="conditional"/>
+			<xs:element ref="function"/>
+			<xs:element ref="equation"/>
+			<xs:group ref="statement"/>
+		</xs:choice>
+	</xs:group>
+	<xs:group name="statement">
+		<xs:choice>
+			<xs:element ref="if"/>
+			<xs:element ref="switch"/>
+			<xs:element ref="repeat"/>
+			<xs:element ref="while"/>
+			<xs:element ref="for"/>
+		</xs:choice>
+	</xs:group>
+	<xs:group name="point">
+		<xs:sequence>
+			<xs:element name="x" type="xs:double"/>
+			<xs:element name="y" type="xs:double"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="rectangle">
+		<xs:sequence>
+			<xs:element name="origin">
+				<xs:complexType>
+					<xs:group ref="point"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="corner">
+				<xs:complexType>
+					<xs:group ref="point"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="area">
+		<xs:sequence>
+			<xs:element name="center">
+				<xs:complexType>
+					<xs:group ref="point"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="size">
+				<xs:complexType>
+					<xs:group ref="dimension"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<xs:element name="placement">
+		<xs:annotation>
+			<xs:documentation>everything related to
+ visual location</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice>
+				<xs:group ref="point"/>
+				<xs:group ref="rectangle"/>
+				<xs:group ref="area"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:group name="button">
+		<xs:choice>
+			<xs:element name="actionButton">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="string" type="xs:string"/>
+						<xs:element name="action">
+							<xs:annotation>
+								<xs:documentation>start, stop, pause, step, reset, reset inputs, reset states, reset time,restart</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="start"/>
+									<xs:enumeration value="stop"/>
+									<xs:enumeration value="pause"/>
+									<xs:enumeration value="continue"/>
+									<xs:enumeration value="step"/>
+									<xs:enumeration value="reset"/>
+									<xs:enumeration value="restart"/>
+									<xs:enumeration value="reset_inputs"/>
+									<xs:enumeration value="reset_states"/>
+									<xs:enumeration value="reset_time"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="helpButton">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="string" type="xs:string"/>
+						<xs:element name="action">
+							<xs:annotation>
+								<xs:documentation>list of assignments, interfaces, explanations, etc
+the variable can be used to index this list</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element ref="nameRef"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:group ref="variableRef"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="checkButton">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="string" type="xs:string"/>
+						<xs:group ref="variableRef"/>
+						<xs:element name="onImagePath" type="xs:string" minOccurs="0"/>
+						<xs:element name="offImagePath" type="xs:string" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="radioButton">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="string" type="xs:string"/>
+						<xs:group ref="variableRef"/>
+						<xs:element name="value" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>value of the variable
+radioButton is selected when variable has this value, and variable gets this value when radioButton is pressed</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="setButton">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="string" type="xs:string"/>
+						<xs:group ref="variableRef"/>
+						<xs:element name="value" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>value of the variable
+radioButton is selected when variable has this value, and variable gets this value when radioButton is pressed</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+	<xs:element name="widget">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="placement"/>
+				<xs:element name="border" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="borderLine">
+								<xs:annotation>
+									<xs:documentation>none, simple, raised, sunken, etched</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="borderColor" type="color"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="colors" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="foreground" type="color" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>default OS</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="background" type="color" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>default OS</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="additional1" type="color" minOccurs="0"/>
+							<xs:element name="additional2" type="color" minOccurs="0"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="font" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>default = OS</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="name" type="xs:string"/>
+							<xs:element name="size" type="xs:int"/>
+							<xs:element name="bold" type="xs:boolean"/>
+							<xs:element name="italic" type="xs:boolean"/>
+							<xs:element name="underline" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:choice>
+					<xs:group ref="staticWidget"/>
+					<xs:group ref="dynamicWidget"/>
+				</xs:choice>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:string" use="optional"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:group name="slider">
+		<xs:choice>
+			<xs:element name="slider">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:element name="orientation" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>horizontal (default), vertical</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="horizontal"/>
+									<xs:enumeration value="vertical"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="inverted" type="xs:boolean" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>true, false(default)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="showLabel" type="xs:boolean" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>true(default), false</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="tickmarks" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="showTickmarks" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>true, false(default)</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="minorTickmarks" type="xs:double" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>defaults to 25 tickmarks for full range</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="majorTickmarks" type="xs:double" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>defaults to 6 tickmarks for full range</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:group ref="interval"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="pictureSlider">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:element name="imagePath" type="xs:string" minOccurs="0"/>
+						<xs:element name="backgroundImagePath" type="xs:string" minOccurs="0"/>
+						<xs:group ref="interval"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="wheelSlider">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:group ref="interval"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="columnSlider">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:group ref="interval"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="simulationSlider">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="orientation" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>horizontal (default), vertical</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="horizontal"/>
+									<xs:enumeration value="vertical"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:group ref="interval"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+	<xs:group name="graphical">
+		<xs:choice>
+			<xs:element name="text">
+				<xs:annotation>
+					<xs:documentation>text used to be a static widget, hence it is still possible to specify the as static when defining with a string instead of a variable</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:choice>
+							<xs:element name="string" type="xs:string"/>
+							<xs:group ref="variableRef"/>
+						</xs:choice>
+						<xs:element name="scrollbar" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="horizontal" type="xs:boolean" minOccurs="0"/>
+									<xs:element name="vertical" type="xs:boolean" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="dial">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:element name="showNumber" type="xs:boolean" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>true, false (default)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="hand">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="startAngle" type="xs:double"/>
+									<xs:element name="stopAngle" type="xs:double"/>
+									<xs:element name="clockWise" type="xs:boolean" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>true(default), false</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="tickmarks" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="showTickmarks" type="xs:boolean" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>true, false(default)</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="showNumber" type="xs:boolean" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>true, false (default)</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="segments" type="xs:double" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>amount of segments, default 4</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:group ref="interval"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="gauge">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:element name="showNumber" type="xs:boolean" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>true, false (default)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="hand">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="startAngle" type="xs:double"/>
+									<xs:element name="stopAngle" type="xs:double"/>
+									<xs:element name="clockWise" type="xs:boolean" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>true(default), false</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="tickmarks" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="showTickmarks" type="xs:boolean">
+										<xs:annotation>
+											<xs:documentation>true, false(default)</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="showNumber" type="xs:boolean" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>true, false (default)</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="segments" type="xs:double" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>amount of segments, default 4</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:group ref="interval"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="graph">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="basics" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="autoscale" type="xs:boolean" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>true, false(default)</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="showGrid" type="xs:boolean" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>true(default), false</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="curves" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence maxOccurs="unbounded">
+									<xs:element name="curve">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="x">
+													<xs:complexType>
+														<xs:sequence>
+															<xs:group ref="variableRef"/>
+														</xs:sequence>
+													</xs:complexType>
+												</xs:element>
+												<xs:element name="y">
+													<xs:complexType>
+														<xs:sequence>
+															<xs:group ref="variableRef"/>
+														</xs:sequence>
+													</xs:complexType>
+												</xs:element>
+												<xs:element name="color" type="color" minOccurs="0"/>
+												<xs:element name="lineWidth" type="xs:float" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>1(default),1.5, 2, 4</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="marker" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>none(default), point, dot, pixel,  rectangle, circle, diamond, filled_rectangle, filled_circle, filled_diamond </xs:documentation>
+													</xs:annotation>
+													<xs:simpleType>
+														<xs:restriction base="xs:string">
+															<xs:enumeration value="none"/>
+															<xs:enumeration value="dot"/>
+															<xs:enumeration value="rectangle"/>
+															<xs:enumeration value="circle"/>
+															<xs:enumeration value="diamond"/>
+															<xs:enumeration value="filled_rectangle"/>
+															<xs:enumeration value="filled_circle"/>
+															<xs:enumeration value="filled_diamond"/>
+															<xs:enumeration value="point"/>
+														</xs:restriction>
+													</xs:simpleType>
+												</xs:element>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element ref="axes"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="thermometer">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:element name="tickmarks" type="xs:double" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>if not set no tickmarks will be drawn</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="showNumber" type="xs:boolean" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>true, false (default)</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:group ref="interval"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="tab">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:element name="showTabs" type="xs:boolean" default="true" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>true(default), false</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="tabSheets">
+							<xs:complexType>
+								<xs:sequence maxOccurs="unbounded">
+									<xs:element name="tabSheet">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:group ref="labelValue"/>
+												<xs:element name="interfaceName" type="xs:string"/>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="progress">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:element name="orientation" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>horizontal (default), vertical</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="horizontal"/>
+									<xs:enumeration value="vertical"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:group ref="interval"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="animation">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="basics" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="showGrid" type="xs:boolean" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>true, false(default)</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="showAxesOnTop" type="xs:boolean" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>true, false(default)</xs:documentation>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element ref="axes"/>
+						<xs:element name="animationElements" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence maxOccurs="unbounded">
+									<xs:element name="animationElement">
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="placementExpression">
+													<xs:annotation>
+														<xs:documentation>similiar to the placement tag of the widgets only now Expressions are used</xs:documentation>
+													</xs:annotation>
+													<xs:complexType>
+														<xs:sequence>
+															<xs:element ref="position"/>
+															<xs:element name="size">
+																<xs:complexType>
+																	<xs:group ref="sizeExpression"/>
+																</xs:complexType>
+															</xs:element>
+															<xs:element name="anchor" minOccurs="0">
+																<xs:annotation>
+																	<xs:documentation>TopLeft, TopRight, BottomLeft, BottomRight, Center</xs:documentation>
+																</xs:annotation>
+																<xs:simpleType>
+																	<xs:restriction base="xs:string">
+																		<xs:enumeration value="TopLeft"/>
+																		<xs:enumeration value="TopRight"/>
+																		<xs:enumeration value="BottomLeft"/>
+																		<xs:enumeration value="BottomRight"/>
+																		<xs:enumeration value="Center"/>
+																	</xs:restriction>
+																</xs:simpleType>
+															</xs:element>
+														</xs:sequence>
+													</xs:complexType>
+												</xs:element>
+												<xs:element name="colorsExpression" minOccurs="0">
+													<xs:annotation>
+														<xs:documentation>similiar to the colors tag of the widgets only now Expressions are used</xs:documentation>
+													</xs:annotation>
+													<xs:complexType>
+														<xs:sequence>
+															<xs:element name="foreground" minOccurs="0">
+																<xs:annotation>
+																	<xs:documentation>default OS</xs:documentation>
+																</xs:annotation>
+																<xs:complexType>
+																	<xs:group ref="colorExpression"/>
+																</xs:complexType>
+															</xs:element>
+															<xs:element name="background" minOccurs="0">
+																<xs:annotation>
+																	<xs:documentation>default OS</xs:documentation>
+																</xs:annotation>
+																<xs:complexType>
+																	<xs:group ref="colorExpression"/>
+																</xs:complexType>
+															</xs:element>
+															<xs:element name="additional1" minOccurs="0">
+																<xs:complexType>
+																	<xs:group ref="colorExpression"/>
+																</xs:complexType>
+															</xs:element>
+															<xs:element name="additional2" minOccurs="0">
+																<xs:complexType>
+																	<xs:group ref="colorExpression"/>
+																</xs:complexType>
+															</xs:element>
+														</xs:sequence>
+													</xs:complexType>
+												</xs:element>
+												<xs:element name="lineWidthExpression" minOccurs="0">
+													<xs:complexType>
+														<xs:group ref="expression"/>
+													</xs:complexType>
+												</xs:element>
+												<xs:choice>
+													<xs:element name="rectangleAnimation"/>
+													<xs:element name="triangleAnimation">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="orientation" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Top(default), Left, Right, Bottom</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:enumeration value="Top"/>
+																			<xs:enumeration value="Left"/>
+																			<xs:enumeration value="Right"/>
+																			<xs:enumeration value="Bottom"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="vertexPositionExpression" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>0 to 100%, default 50%</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:group ref="expression"/>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="imageAnimation">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="fitBounds" type="xs:boolean" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>true (default), false</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+																<xs:element name="centreImage" type="xs:boolean" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>true (default), false</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+																<xs:element name="imageSelectionExpression" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>0 (default)</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:group ref="expression"/>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="images">
+																	<xs:complexType>
+																		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+																			<xs:element name="path" type="xs:string">
+																				<xs:annotation>
+																					<xs:documentation>path to image file</xs:documentation>
+																				</xs:annotation>
+																			</xs:element>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="labelAnimation">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="string" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Any label string</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:whiteSpace value="preserve"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="vertical" type="xs:boolean" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>true, false(default)</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+																<xs:element name="valueExpression" minOccurs="0">
+																	<xs:complexType>
+																		<xs:group ref="expression"/>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="format" type="xs:string" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>0, 0.00, #.##
+and so on 
+default = 0.00</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="lineAnimation">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="originArrow" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>none (default), simple, filled, dot</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:enumeration value="none"/>
+																			<xs:enumeration value="simple"/>
+																			<xs:enumeration value="filled"/>
+																			<xs:enumeration value="dot"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="endArrow" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>none (default), simple, filled, dot</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:pattern value="none"/>
+																			<xs:pattern value="simple"/>
+																			<xs:pattern value="filled"/>
+																			<xs:pattern value="dot"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="originExpression">
+																	<xs:annotation>
+																		<xs:documentation>point expression</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:group ref="pointExpression"/>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="endExpression">
+																	<xs:annotation>
+																		<xs:documentation>point expression</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:group ref="pointExpression"/>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="colorAnimation">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="orientation" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>Top(default), Left, Right, Bottom</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:enumeration value="Top"/>
+																			<xs:enumeration value="Left"/>
+																			<xs:enumeration value="Right"/>
+																			<xs:enumeration value="Bottom"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="hueExpression" minOccurs="0"/>
+																<xs:element name="saturationExpression" minOccurs="0"/>
+																<xs:element name="brightnessExpression" minOccurs="0"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="ellipseAnimation">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="startArrow" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>none (default), simple, filled, dot</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:enumeration value="none"/>
+																			<xs:enumeration value="simple"/>
+																			<xs:enumeration value="filled"/>
+																			<xs:enumeration value="dot"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="stopArrow" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>none (default), simple, filled, dot</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:pattern value="none"/>
+																			<xs:pattern value="simple"/>
+																			<xs:pattern value="filled"/>
+																			<xs:pattern value="dot"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="startExpression">
+																	<xs:annotation>
+																		<xs:documentation>angle expression (in degrees)</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:group ref="expression"/>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="stopExpression">
+																	<xs:annotation>
+																		<xs:documentation>angle expression (in degrees)</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:group ref="expression"/>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="ballAnimation">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="filled" type="xs:boolean" default="true" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>true (default), false</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+																<xs:element name="arrow1" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>none (default), simple, filled, dot</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:enumeration value="none"/>
+																			<xs:enumeration value="simple"/>
+																			<xs:enumeration value="filled"/>
+																			<xs:enumeration value="dot"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="arrow2" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>none (default), simple, filled, dot</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:pattern value="none"/>
+																			<xs:pattern value="simple"/>
+																			<xs:pattern value="filled"/>
+																			<xs:pattern value="dot"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="arrow1Expression" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>point expression</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:group ref="pointExpression"/>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="arrow2Expression" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>point expression</xs:documentation>
+																	</xs:annotation>
+																	<xs:complexType>
+																		<xs:group ref="pointExpression"/>
+																	</xs:complexType>
+																</xs:element>
+																<xs:element name="traceType" default="none" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>none (default), line, smalldot, mediumdot, largedot</xs:documentation>
+																	</xs:annotation>
+																	<xs:simpleType>
+																		<xs:restriction base="xs:string">
+																			<xs:enumeration value="none"/>
+																			<xs:enumeration value="line"/>
+																			<xs:enumeration value="smalldot"/>
+																			<xs:enumeration value="mediumdot"/>
+																			<xs:enumeration value="largedot"/>
+																		</xs:restriction>
+																	</xs:simpleType>
+																</xs:element>
+																<xs:element name="tracePoints" type="xs:integer" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>100 (default)</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+																<xs:element name="traceInterval" type="xs:integer" minOccurs="0">
+																	<xs:annotation>
+																		<xs:documentation>5 (default)</xs:documentation>
+																	</xs:annotation>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="polylineAnimation"/>
+													<xs:element name="springAnimation"/>
+													<xs:element name="vectorAnimation"/>
+												</xs:choice>
+											</xs:sequence>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+	<xs:group name="numerical">
+		<xs:choice>
+			<xs:element name="numeric">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:element name="readonly" type="xs:boolean" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>true/false
+default true</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="format" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>0, 0.00, #.##
+and so on 
+default = 0.00</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="numericSpin">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:element name="readonly" type="xs:boolean" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>true/false
+default true</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="format" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>0, 0.00, #.##
+and so on 
+default = 0.00</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:group ref="interval"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="comboBox">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="variableRef"/>
+						<xs:element name="items">
+							<xs:complexType>
+								<xs:sequence minOccurs="0" maxOccurs="unbounded">
+									<xs:element ref="item"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+	<xs:group name="dynamicWidget">
+		<xs:choice>
+			<xs:group ref="button"/>
+			<xs:group ref="slider"/>
+			<xs:group ref="graphical"/>
+			<xs:group ref="numerical"/>
+		</xs:choice>
+	</xs:group>
+	<xs:group name="staticWidget">
+		<xs:choice>
+			<xs:element name="label">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="string" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="area">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="shape">
+							<xs:annotation>
+								<xs:documentation>rectangle,
+ellipse</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="rectangle"/>
+									<xs:enumeration value="ellipse"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="lineWidth" type="xs:integer"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="group">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="string" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="image">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="path" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>path to image file</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="math">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="path" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>path to math file</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="divider">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="orientation" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>horizontal(default), vertical</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:enumeration value="horizontal"/>
+									<xs:enumeration value="vertical"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+	<xs:group name="interval">
+		<xs:sequence>
+			<xs:element name="minimum" type="xs:double"/>
+			<xs:element name="maximum" type="xs:double"/>
+			<xs:element name="step" type="xs:double" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>default 0.1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<xs:element name="name" type="xs:string" nillable="false"/>
+	<xs:element name="nameRef" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>reference to unique name</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:group name="dimension">
+		<xs:sequence>
+			<xs:element name="width" type="xs:double"/>
+			<xs:element name="heigth" type="xs:double"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:simpleType name="color">
+		<xs:annotation>
+			<xs:documentation>ARGB int color</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:hexBinary"/>
+	</xs:simpleType>
+	<xs:group name="axis">
+		<xs:sequence>
+			<xs:element name="minimum" type="xs:double"/>
+			<xs:element name="maximum" type="xs:double"/>
+			<xs:element name="major" type="xs:double" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>default 0</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="minor" type="xs:double" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>default 0</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<xs:element name="axes">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="xaxis">
+					<xs:complexType>
+						<xs:group ref="axis"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="yaxis">
+					<xs:complexType>
+						<xs:group ref="axis"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="position">
+		<xs:complexType>
+			<xs:group ref="pointExpression"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:group name="colorExpression">
+		<xs:annotation>
+			<xs:documentation>RGB expressions</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="red" minOccurs="0">
+				<xs:complexType>
+					<xs:group ref="expression"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="green" minOccurs="0">
+				<xs:complexType>
+					<xs:group ref="expression"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="blue" minOccurs="0">
+				<xs:complexType>
+					<xs:group ref="expression"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="pointExpression">
+		<xs:sequence>
+			<xs:element name="x">
+				<xs:complexType>
+					<xs:group ref="expression"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="y">
+				<xs:complexType>
+					<xs:group ref="expression"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="sizeExpression">
+		<xs:sequence>
+			<xs:element name="width">
+				<xs:complexType>
+					<xs:group ref="expression"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="height">
+				<xs:complexType>
+					<xs:group ref="expression"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="lefthandside">
+		<xs:annotation>
+			<xs:documentation>expression that can be assigned</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element ref="variable"/>
+			<xs:element ref="index">
+				<xs:annotation>
+					<xs:documentation>index operator .[.]
+A[2,3] = time
+NOTE: from version 1,1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="matrix">
+				<xs:annotation>
+					<xs:documentation>matrix operator [{expr}]
+[a1, a2; a3, a4]= A * B
+NOTE: from version 1,1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+	<xs:element name="index">
+		<xs:annotation>
+			<xs:documentation>index operator .[.]
+A[2,3] = time</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="variable"/>
+				<xs:group ref="expression"/>
+				<xs:group ref="expression" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="matrix">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:group ref="expression"/>
+			</xs:sequence>
+			<xs:attribute name="rows" use="required">
+				<xs:annotation>
+					<xs:documentation>number of rows</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="columns" use="required">
+				<xs:annotation>
+					<xs:documentation>number of columns</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="variableExpression">
+		<xs:complexType>
+			<xs:group ref="expression"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:group name="variableRef">
+		<xs:annotation>
+			<xs:documentation>reference to variables</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element ref="variable"/>
+			<xs:element ref="variableExpression">
+				<xs:annotation>
+					<xs:documentation>reference to an expression that uses variables
+
+NOTE: For control elements only values can be written back if the expression is atomic/variable
+NOTE: from version 1.1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+	<xs:element name="item">
+		<xs:complexType>
+			<xs:group ref="labelValue"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:group name="labelValue">
+		<xs:sequence>
+			<xs:element name="label" type="xs:string"/>
+			<xs:element name="value" type="xs:string"/>
+		</xs:sequence>
+	</xs:group>
+</xs:schema>
