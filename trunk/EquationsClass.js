@@ -1,7 +1,16 @@
+// (c) Wouter van Joolingen, University of Twente
+// This work is made available under the GNU Lesser General Public License
+// You may copy distribute, contribute or modify this code, under the condition that you leave this copyright message intact
+
+//This file contains the computational tree definition, needed for the computational heart of the modeling code.
+//Each node represents a computation and the model as a whole is built as a set of equation nodes.
+
+
 var EqNode, BinaryExpressionNode, ConstantNode, VariableNode, EquationNode, UnaryExpressionNode, Matrix, DataStore;
 
 function initEquations() {
 
+//Base class for all nodes
 EqNode = new JS.Class({
 	initialize: function () {
 	},
@@ -18,6 +27,8 @@ EqNode = new JS.Class({
 	}
 });
 
+
+//binary expressions, e.g. x * y
 BinaryExpressionNode = new JS.Class(EqNode, {
 	initialize: function(left, right, op) {
 		this.left = left;
@@ -78,6 +89,8 @@ BinaryExpressionNode = new JS.Class(EqNode, {
 	}
 });
 
+
+//Unary expressions, e.g. sin x
 UnaryExpressionNode = new JS.Class(EqNode, {
 	initialize: function(fn, argument) {
 		this.setFunction(fn);
@@ -144,6 +157,7 @@ UnaryExpressionNode = new JS.Class(EqNode, {
 	}
 });
 
+//constant nodes e.g. 3
 ConstantNode = new JS.Class(EqNode, {
 	initialize: function (value) {
 		this.value = value;
@@ -158,6 +172,8 @@ ConstantNode = new JS.Class(EqNode, {
 	}
 });
 
+
+//variable nodes e.g. x
 VariableNode = new JS.Class(EqNode, {
 	initialize: function (name, value, kind, externalName, pair) {
 		this.name = name;
@@ -204,6 +220,8 @@ VariableNode = new JS.Class(EqNode, {
 	
 });
 
+
+//Equation assignmets output = 3
 EquationNode = new JS.Class(EqNode, {
 	initialize: function(assignment, expression) {
 		this.assignment = assignment;
@@ -221,6 +239,8 @@ EquationNode = new JS.Class(EqNode, {
 	}
 });
 
+
+//Supportive class for matrix computations.
 Matrix = new JS.Class({
 	initialize: function (numRows, numColumns) {
 		this.data = new Array(numRows*numColumns);
