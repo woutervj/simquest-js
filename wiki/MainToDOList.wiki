@@ -9,26 +9,26 @@ As we are just starting this project the task list is not so long, but each of t
 
 Simulation engine:
 
-* Functor nodes
-* if-then-else nodes
-* Handling vectors and matrices
-* Runge-Kutta integration methods
+  * Functor nodes
+  * if-then-else nodes
+  * Handling vectors and matrices
+  * Runge-Kutta integration methods
 
 UI
 Most of the UI components are yet to be created:
-* Graph
-* Sliders
-* Thermometers
-* Animations - using SVG or canvas drawings
-* Composite components - numwerical input
-* Images
+  * Graph
+  * Sliders
+  * Thermometers
+  * Animations - using SVG or canvas drawings
+  * Composite components - numwerical input
+  * Images
 
 Assignments
-* Specification in the XML source
-* Implementation
-* Handling multiple interfaces and controlling them from the assignment
-* The control structure
+  * Specification in the XML source
+  * Implementation
+  * Handling multiple interfaces and controlling them from the assignment
+  * The control structure
 
-Explanations
-* XML specification
-* Implementation
+Explanations 
+  * XML specification
+  * Implementation
