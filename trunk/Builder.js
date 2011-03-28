@@ -10,9 +10,11 @@ Builder = new JS.Class({
 		// for IE 5/6
 			xhttp=new ActiveXObject("Microsoft.XMLHTTP");
 		}
+		console.log("Start loading " + filename);
 		xhttp.open("GET",filename,false);
 		xhttp.send();
 		this.xmlDoc=xhttp.responseXML;
+		if (this.xmlDoc) { console.log("Loading successful: " + filename);} else { console.log("loading failed: " + filename);}
 		this.model = new Model("xmlModel");
 		this.interfaces = new Array();
 	},
@@ -218,6 +220,14 @@ Builder = new JS.Class({
 				case 'corner':
 					p2 = this.processPoint(nd);
 					break;
+				case 'x':
+					p1 = new Array();
+					p2 = new Array();
+					p1['x'] = this.processTextOrExpression(nd);
+					break;
+				case 'y':
+					p1['y'] = this.processTextOrExpression(nd);
+					break;
 				default:
 					break;
 			}
@@ -297,8 +307,15 @@ Builder = new JS.Class({
 				case 'numeric':
 					widget = this.processNumericField(nd);
 					break
+				case 'numericSpin':
+					widget = this.processNumericSpin(nd);
+					break
 				case 'label':
 					widget = this.processLabel(nd);
+					break;
+				case 'math':
+				case 'image':
+					widget = this.processImage(nd);
 					break;
 				default:
 					//we do not handle the remaining widgets yet, the list above may grow!
@@ -371,6 +388,48 @@ Builder = new JS.Class({
 					break;
 				default:
 					break;
+			}
+		}
+		return widget;
+	},
+	
+	processNumericSpin: function (node) {
+		var widget = new NumericInput();
+		for (var i=0; i<node.childNodes.length; i++) {
+			nd = node.childNodes[i];
+			switch (nd.nodeName) {
+				case 'variable':
+					widget.variable = this.model.getExtVariable(nd.childNodes[0].nodeValue);
+					break;
+				case 'format':
+					widget.format = nd.childNodes[0].nodeValue;
+					break;
+				case 'minimum':
+					widget.min = parseFloat(nd.childNodes[0].nodeValue);
+					break;
+				case 'maximum':
+					widget.max = parseFloat(nd.childNodes[0].nodeValue);
+					break;
+				case 'step':
+					widget.step = parseFloat(nd.childNodes[0].nodeValue);
+					break;
+				default:
+					break;
+			}
+		}
+		return widget;
+	},
+	
+	processImage: function (node) {
+		var widget = new Image();
+		for (var i=0; i<node.childNodes.length; i++) {
+			nd = node.childNodes[i];
+			switch (nd.nodeName) {
+			case 'path':
+				widget.src = nd.childNodes[0].nodeValue;
+				break;
+			default:
+				break;
 			}
 		}
 		return widget;
