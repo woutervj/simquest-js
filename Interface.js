@@ -108,7 +108,7 @@ InterfaceElement = new JS.Class({
 	},
 	
 	decoratePosition: function (element) {
-		element.style.position = 'absolute'
+		element.style.position = 'absolute';
 		element.style.left = this.left;
 		element.style.width = this.width;
 		element.style.top = this.top;
@@ -192,13 +192,13 @@ NumericField = new JS.Class(InterfaceElement, {
 		elmt.style.textAlign = 'right';
 		this.decorate(elmt);
 		elmt.value = sprintf("%.2f", vr.compute()); 
-		this.resetters.push(function () { console.log("Reset " + vr.compute() ); elmt.value = sprintf("%.2f", vr.compute());});
+		this.resetters.push(function () { elmt.value = sprintf("%.2f", vr.compute());});
 		if (vr.kind == 'input' || vr.kind == 'state' ) {
 			elmt.onchange = function () {vr.setValue(elmt.value); mdl.computeAndUpdate();}; //updater needs to change if we allow autocompute disabled.
 		}
-		if (vr.kind != 'input' ) {
+//		if (vr.kind != 'input' ) {
 			this.updaters.push(function () { elmt.value = sprintf("%.2f", vr.compute());});
-		}
+//		}
 		return elmt;
 	}
 });
@@ -215,6 +215,110 @@ Label = new JS.Class(InterfaceElement, {
 		this.decorate(elmt);
 		return elmt;
 	}	
+});
+
+NumericInput = new JS.Class(InterfaceElement, {
+	initialize: function () {
+		this.callSuper();
+		this.variable = undefined;
+		this.step = 0.1;
+		this.min = undefined;
+		this.max = undefined;
+	},
+	
+	getElement: function (doc, model) {
+		var vr = this.variable;
+		var mdl = model;
+		var buttonWidth = Math.round(this.height * 0.8);
+		var elmt = doc.createElement('div');
+		this.decorate(elmt);
+		elmt.style.margin = "0px";
+		elmt.style.padding = "0px";
+		var ip = doc.createElement('input');
+		ip.type='text';
+		ip.style.position = 'absolute';
+		ip.style.left = 0;
+		ip.style.top = 0;
+		ip.style.width = this.width - buttonWidth;
+		ip.style.height = this.height;
+		ip.style.margin = "0px";
+		ip.style.padding = "0px";
+		var up = doc.createElement('input');
+		up.type='button';
+		up.style.position = 'absolute';
+		up.style.margin = "0px";
+		up.style.padding = "0px";
+		up.style.left = this.width - buttonWidth;
+		up.style.top = -1;
+		up.style.width = buttonWidth;
+		up.style.height = 2 + this.height/2;
+		var dn = doc.createElement('input');
+		dn.type='button';
+		dn.style.position = 'absolute';
+		dn.style.margin = "0px";
+		dn.style.padding = "0px";
+		dn.style.left = this.width - buttonWidth;
+		dn.style.top = this.height/2 -1;
+		dn.style.width = buttonWidth;
+		dn.style.height = 2 + this.height/2;
+
+		ip.value = sprintf("%.2f", vr.compute());
+			//handlers for the buttons. Need to add sensitivity for min and max
+		var step = this.step; // in lambda functions this is undefined...
+		var min = this.min;
+		var max = this.max;
+		if (this.max == undefined) {
+			up.onclick = function () {vr.setValue(vr.value + step); mdl.computeAndUpdate();};
+		} else {
+			up.onclick = function () {
+				var newval = vr.value + step;
+				if (newval > max) { newval = max; } 
+				vr.setValue(newval); 
+				mdl.computeAndUpdate();
+			};
+		}
+		if (this.min == undefined) {
+			console.log("No minimum");
+			dn.onclick = function () {vr.setValue(vr.value - step); mdl.computeAndUpdate();};
+		} else {
+			console.log("With minimum");
+			dn.onclick = function () {
+				console.log("Minimum: " + min);
+				var newval = vr.value - step;
+				if (newval < min) { newval = min; } 
+				vr.setValue(newval); 
+				mdl.computeAndUpdate();
+			};
+		}
+		dn.onclick = function () {vr.setValue(vr.value - step); mdl.computeAndUpdate();};
+		elmt.appendChild(ip);
+		elmt.appendChild(up);
+		elmt.appendChild(dn);
+		if (vr.kind == 'input' || vr.kind == 'state' ) {
+			ip.onchange = function () {vr.setValue(ip.value); mdl.computeAndUpdate();}; //updater needs to change if we allow autocompute disabled.
+		}
+		this.resetters.push(function () { ip.value = sprintf("%.2f", vr.compute());});
+
+	//	if (vr.kind != 'input' ) {
+			this.updaters.push(function () { ip.value = sprintf("%.2f", vr.compute());});
+	//	}
+		return elmt;
+	}
+
+});
+
+Image = new JS.Class(InterfaceElement, {
+	initialize: function () {
+		this.callSuper();
+		this.src = "";
+	},
+
+	getElement: function(doc, model) {
+		var elmt = doc.createElement('image');
+		this.decorate(elmt);
+		elmt.src = this.src;
+		return elmt;
+	}
 });
 
 };
