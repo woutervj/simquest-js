@@ -8,6 +8,7 @@
 	<script language="javascript" src="Model.js" type="text/javascript"></script>
 	<script language="javascript" src="Builder.js" type="text/javascript"></script>
 	<script language="javascript" src="Interface.js" type="text/javascript"></script>
+	<script language="javascript" src="Animation.js" type="text/javascript"></script>
 	
 </head>
 
@@ -15,10 +16,10 @@
 	<script type="text/javascript">
 	var myModel, myInterface;
 	
-	JS.require('JS.Class', function () { initEquations(); initModel(); initInterface(); initBuilder(); doSimulation()});
+	JS.require('JS.Class', function () { initEquations(); initModel(); initInterface(); initAnimation(); initBuilder(); doSimulation()});
 	
 	function doSimulation () {
-		var bldr = new Builder("osc.sqx");
+		var bldr = new Builder("iso.sqx");
 		myModel = bldr.buildModel();
 		myModel.name = "myModel";
 		myInterFace = bldr.buildInterfaces()[0];

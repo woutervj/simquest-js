@@ -244,7 +244,7 @@ Builder = new JS.Class({
 		//the node is either text (for a value) or an expressionNode
 		if (node.childNodes.length == 1) {
 			//text
-			return node.childNodes[0].nodeValue;
+			return parseFloat(node.childNodes[0].nodeValue);
 		} else {
 			return this.processExpression(node)
 		}
@@ -317,6 +317,10 @@ Builder = new JS.Class({
 				case 'image':
 					widget = this.processImage(nd);
 					break;
+				case 'animation':
+					widget = this.processAnimation(nd);
+					break;
+					
 				default:
 					//we do not handle the remaining widgets yet, the list above may grow!
 					break;
@@ -423,7 +427,7 @@ Builder = new JS.Class({
 	processImage: function (node) {
 		var widget = new Image();
 		for (var i=0; i<node.childNodes.length; i++) {
-			nd = node.childNodes[i];
+			var nd = node.childNodes[i];
 			switch (nd.nodeName) {
 			case 'path':
 				widget.src = nd.childNodes[0].nodeValue;
@@ -433,8 +437,158 @@ Builder = new JS.Class({
 			}
 		}
 		return widget;
-	}
+	},
 
+	processAnimation: function (node) {
+		console.log("starting animation");
+		var widget = new Animation();
+		for (var i=0; i<node.childNodes.length; i++) {
+			var nd = node.childNodes[i];
+			switch (nd.nodeName) {
+			case 'basics':
+				var bscs = this.processDefaultNode(nd);
+				widget.showGrid =  (bscs['showGrid'] == 'true');
+				widget.showAxesOnTop =  (bscs['showAxesOnTop'] == 'true');
+				break;
+			case 'axes':
+				this.processAxes(nd, widget);
+				break;
+				
+			case 'animationElements':
+				this.processAnimationElements(nd, widget);
+				break;
+			default:
+				break;
+				
+			}
+		}
+		return widget;
+	},
+	
+	processAxes: function(node, animation)
+	{
+		for (var i=0; i<node.childNodes.length; i++) {
+			var nd = node.childNodes[i];
+			switch (nd.nodeName) {
+			case 'xaxis':
+				var xprops = this.processDefaultNode(nd);
+				animation.setXaxis(xprops);
+				break;
+			case 'yaxis':
+				var yprops = this.processDefaultNode(nd);
+				animation.setYaxis(yprops);
+				break;
+			default:
+			break
+			}
+		}					
+	},
+	
+	processAnimationElements: function (node, animation)
+	{
+		for (var i=0; i<node.childNodes.length; i++) {
+			var nd = node.childNodes[i];
+			switch (nd.nodeName) {
+				case 'animationElement':
+					this.processAnimationElement(nd, animation);
+					break;
+				
+				default:
+				break;
+			}
+		}
+	},
+	
+	processAnimationElement: function (node, animation)
+	{
+		console.log("processing animation element");
+		var elmt, placement, colors;
+		for (var i=0; i<node.childNodes.length; i++) {
+			var nd = node.childNodes[i];
+			
+			switch (nd.nodeName) {
+				case 'placementExpression':
+					placement = this.processPlacementExpression(nd);
+					break;
+					
+				case 'colorsExpression':
+					colors = this.processColorsExpression(nd);
+					break;
+					
+				case 'lineWithExpression':
+				//todo
+					break;
+				
+				//animationTypes
+				case 'ellipseAnimation':
+					elmt = new Ellipse();
+					console.log("ellipse");
+					//process data
+					break;
+				
+				default:
+				break;
+			}
+		}
+		if (elmt != undefined) {
+			elmt.setPlacement(placement);
+			elmt.setColors(colors);
+			animation.addShape(elmt);
+			console.log("adding element");
+		}
+	},
+	
+	
+//Animated properties
+
+	processDefaultNodesWithExpressions: function (node) {
+		var a = new Array();
+		for (var i=0; i<node.childNodes.length; i++) {
+			nd = node.childNodes[i];
+			if (nd.nodeName!='#text') {
+				a[nd.nodeName] = this.processExpression(nd.childNodes[1]);
+			}			
+		}
+		return a;
+	},
+	
+	processPlacementExpression: function(node) 
+	{
+		var plcmt = new Array();
+		for (var i=0; i<node.childNodes.length; i++) {
+			var nd = node.childNodes[i];
+			switch (nd.nodeName) {
+				case 'position':
+				case 'size':
+					plcmt[nd.nodeName] = this.processDefaultNodesWithExpressions(nd);
+					break;
+				case 'anchor':
+					plcmt['anchor'] = nd.childNodes[0].nodeValue;
+					break;
+				default:
+					break;
+			}
+		}	
+		return plcmt;
+	},
+	
+	processColorsExpression: function(node)
+	{
+		var clrs = new Array();
+		for (var i=0; i<node.childNodes.length; i++) {
+			var nd = node.childNodes[i];
+			switch (nd.nodeName) {
+				case 'foreground':
+				case 'background':
+					clrs[nd.nodeName] = this.processDefaultNodesWithExpressions(nd);
+					break;
+				default:
+					break;
+			}
+		}
+		return clrs;
+	}
+	
 });
 
 }

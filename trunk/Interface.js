@@ -32,7 +32,7 @@ Interface = new JS.Class({
 		frame.style.width =w + "px";
 		frame.style.height = h + "px";
 		doc.body.appendChild(frame);
-		for (i=0; i<this.elements.length; i++) {
+		for (var i=0; i<this.elements.length; i++) {
 			frame.contentDocument.body.appendChild(this.elements[i].getElement(frame.contentDocument, this.model));
 		}
 	},
