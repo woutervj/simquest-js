@@ -142,10 +142,14 @@ Ellipse = new JS.Class(Shape, {
 		var elmt = doc.createElementNS("http://www.w3.org/2000/svg",'ellipse');
 		this.computePlacement(elmt);
 		this.computeColor(elmt);
+		var mySelf = this;
+		this.animation.updaters.push (function(){mySelf.computePlacement(elmt); mySelf.computeColor(elmt);});
+		this.animation.resetters.push (function(){mySelf.computePlacement(elmt); mySelf.computeColor(elmt);});
 		console.log('ellipse added');
 		return elmt;
 	},
 	
+
 	computePlacement: function (elmt)
 	{
 		//compute the position using the model and convert to screen coordinates
