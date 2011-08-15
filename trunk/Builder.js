@@ -107,10 +107,20 @@ Builder = new JS.Class({
 				return this.processExpressionVariable(aNode);
 			case 'literal':
 				return this.processLiteral(aNode);
+			case 'conditional':
+				return this.processConditional(aNode);
 			default:
 				return new ConstantNode(0);
 				break;
 		}
+	},
+	
+	processConditional: function(aConditionalNode)
+	{
+		var ifPart = this.processExpression(aConditionalNode.childNodes[1]);
+		var thenPart = this.processExpression(aConditionalNode.childNodes[3]);
+		var elsePart = this.processExpression(aConditionalNode.childNodes[5]);
+		return new ConditionalExpressionNode(ifPart, thenPart, elsePart);
 	},
 	
 	processOperator: function(anOperatorNode) {

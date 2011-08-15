@@ -6,7 +6,7 @@
 //Each node represents a computation and the model as a whole is built as a set of equation nodes.
 
 
-var EqNode, BinaryExpressionNode, ConstantNode, VariableNode, EquationNode, UnaryExpressionNode, Matrix, DataStore;
+var EqNode, BinaryExpressionNode, ConstantNode, ConditionalExpressionNode, VariableNode, EquationNode, UnaryExpressionNode, Matrix, DataStore;
 
 function initEquations() {
 
@@ -82,6 +82,9 @@ BinaryExpressionNode = new JS.Class(EqNode, {
 			case '^':
 				this.computeBlock = function (l,r) { return Math.pow(l,r);};
 				break;
+			case 'greater':
+				this.computeBlock = function (l,r) { return (l>r)};
+				break;				
 			default:
 				this.computeBlock = function (l,r) { return eval (l.toString() + this.operator + r.toString())};
 				break;
@@ -135,13 +138,13 @@ UnaryExpressionNode = new JS.Class(EqNode, {
 			case 'exp':	
 				this.computeBlock = function (a) { return Math.exp(a); };
 				break;
-			case 'asin':	
+			case 'arcsin':	
 				this.computeBlock = function (a) { return Math.asin(a); };
 				break;
-			case 'acos':	
+			case 'arccos':	
 				this.computeBlock = function (a) { return Math.acos(a); };
 				break;
-			case 'atan':	
+			case 'arctan':	
 				this.computeBlock = function (a) { return Math.atan(a); };
 				break;
 			case 'round':	
@@ -220,6 +223,26 @@ VariableNode = new JS.Class(EqNode, {
 	
 });
 
+ConditionalExpressionNode = new JS.Class(EqNode, {
+	initialize: function(ifPart, thenPart, elsePart) {
+		this.ifPart = ifPart;
+		this.thenPart = thenPart;
+		this.elsePart = elsePart;
+	},
+	
+	compute: function()
+	{
+		if (this.ifPart.compute()) {
+			return this.thenPart.compute();
+		} else {
+			return this.elsePart.compute();
+		}	
+	},
+	
+	prettyPrint: function () {
+		return "if "+ ifPart.prettyPrint() + " then " + thenPart.prettyPrint() + " else " + elsePart.prettyPrint() + " endif";
+	}
+});
 
 //Equation assignmets output = 3
 EquationNode = new JS.Class(EqNode, {

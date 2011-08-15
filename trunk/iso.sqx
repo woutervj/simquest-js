@@ -4,7 +4,7 @@
 		<format>1.0</format>
 		<creator>SimQuest</creator>
 		<description></description>
-		<timestamp>2011-08-13T16:48:48.0Z</timestamp>
+		<timestamp>2011-08-15T08:09:09.0Z</timestamp>
 	</header>
 	<showTopicBrowser>false</showTopicBrowser>
 	<topics>
@@ -14,7 +14,7 @@
 				<format>1.0</format>
 				<creator>SimQuest</creator>
 				<description></description>
-				<timestamp>2011-08-13T16:48:48.0Z</timestamp>
+				<timestamp>2011-08-15T08:09:09.0Z</timestamp>
 			</header>
 			<model>
 				<header>
@@ -22,7 +22,7 @@
 					<format>1.0</format>
 					<creator>SimQuest</creator>
 					<description></description>
-					<timestamp>2011-08-13T16:48:48.0Z</timestamp>
+					<timestamp>2011-08-15T08:09:09.0Z</timestamp>
 				</header>
 				<variables>
 					<modelVariable>
@@ -140,20 +140,20 @@
 									<variable>x</variable>
 									<literal>0</literal>
 								</operator>
-								<operator name="/">
-									<function name="arctan">
-										<variable>y</variable>
-									</function>
-									<variable>x</variable>
-								</operator>
-								<operator name="+">
+								<function name="arctan">
 									<operator name="/">
-										<function name="arctan">
-											<variable>y</variable>
-										</function>
+										<variable>y</variable>
 										<variable>x</variable>
 									</operator>
+								</function>
+								<operator name="+">
 									<literal>3.1415926535898</literal>
+									<function name="arctan">
+										<operator name="/">
+											<variable>y</variable>
+											<variable>x</variable>
+										</operator>
+									</function>
 								</operator>
 							</conditional>
 						</equation>
@@ -230,7 +230,7 @@ dvy/dt = ay
 ax = m * Fx
 ay = m * Fy
 F = - k * sqrt(x*x+y*y)
-phi = if x&gt; 0 then arcTan y/x else arcTan y/x + pi endif
+phi = if x&gt; 0 then arcTan (y/x) else pi + arcTan (y/x)  endif
 Fx = F * cos phi
 Fy = F * sin phi
 </originalModel>
@@ -252,7 +252,7 @@ Fy = F * sin phi
 						</origin>
 						<corner>
 							<x>516</x>
-							<y>593</y>
+							<y>623</y>
 						</corner>
 					</placement>
 					<widgets>
@@ -360,6 +360,51 @@ Fy = F * sin phi
 											</stopExpression>
 										</ellipseAnimation>
 									</animationElement>
+									<animationElement>
+										<placementExpression>
+											<position>
+												<x>
+													<literal>0.0</literal>
+												</x>
+												<y>
+													<literal>0.0</literal>
+												</y>
+											</position>
+											<size>
+												<width>
+													<literal>8.42105</literal>
+												</width>
+												<height>
+													<literal>3.66972</literal>
+												</height>
+											</size>
+											<anchor>Center</anchor>
+										</placementExpression>
+										<colorsExpression></colorsExpression>
+										<lineWidthExpression>
+											<literal>1.0</literal>
+										</lineWidthExpression>
+										<lineAnimation>
+											<originArrow>none</originArrow>
+											<endArrow>none</endArrow>
+											<originExpression>
+												<x>
+													<literal>0.0</literal>
+												</x>
+												<y>
+													<literal>0.0</literal>
+												</y>
+											</originExpression>
+											<endExpression>
+												<x>
+													<variable>x</variable>
+												</x>
+												<y>
+													<variable>y</variable>
+												</y>
+											</endExpression>
+										</lineAnimation>
+									</animationElement>
 								</animationElements>
 							</animation>
 						</widget>
@@ -408,6 +453,242 @@ Fy = F * sin phi
 								<string>Stop</string>
 								<action>stop</action>
 							</actionButton>
+						</widget>
+						<widget>
+							<placement>
+								<origin>
+									<x>200</x>
+									<y>560</y>
+								</origin>
+								<corner>
+									<x>260</x>
+									<y>580</y>
+								</corner>
+							</placement>
+							<colors>
+								<foreground>000000</foreground>
+								<background>FFFFFF</background>
+							</colors>
+							<font>
+								<name>Arial</name>
+								<size>11</size>
+								<bold>false</bold>
+								<italic>false</italic>
+								<underline>false</underline>
+							</font>
+							<numericSpin>
+								<variable>x</variable>
+								<format>0.00</format>
+								<minimum>-1.0e6</minimum>
+								<maximum>1.0e6</maximum>
+							</numericSpin>
+						</widget>
+						<widget>
+							<placement>
+								<origin>
+									<x>260</x>
+									<y>560</y>
+								</origin>
+								<corner>
+									<x>320</x>
+									<y>580</y>
+								</corner>
+							</placement>
+							<colors>
+								<foreground>000000</foreground>
+								<background>FFFFFF</background>
+							</colors>
+							<font>
+								<name>Arial</name>
+								<size>11</size>
+								<bold>false</bold>
+								<italic>false</italic>
+								<underline>false</underline>
+							</font>
+							<numericSpin>
+								<variable>vx</variable>
+								<format>0.00</format>
+								<minimum>-1.0e6</minimum>
+								<maximum>1.0e6</maximum>
+							</numericSpin>
+						</widget>
+						<widget>
+							<placement>
+								<origin>
+									<x>200</x>
+									<y>580</y>
+								</origin>
+								<corner>
+									<x>260</x>
+									<y>600</y>
+								</corner>
+							</placement>
+							<colors>
+								<foreground>000000</foreground>
+								<background>FFFFFF</background>
+							</colors>
+							<font>
+								<name>Arial</name>
+								<size>11</size>
+								<bold>false</bold>
+								<italic>false</italic>
+								<underline>false</underline>
+							</font>
+							<numericSpin>
+								<variable>y</variable>
+								<format>0.00</format>
+								<minimum>-1.0e6</minimum>
+								<maximum>1.0e6</maximum>
+							</numericSpin>
+						</widget>
+						<widget>
+							<placement>
+								<origin>
+									<x>260</x>
+									<y>580</y>
+								</origin>
+								<corner>
+									<x>320</x>
+									<y>600</y>
+								</corner>
+							</placement>
+							<colors>
+								<foreground>000000</foreground>
+								<background>FFFFFF</background>
+							</colors>
+							<font>
+								<name>Arial</name>
+								<size>11</size>
+								<bold>false</bold>
+								<italic>false</italic>
+								<underline>false</underline>
+							</font>
+							<numericSpin>
+								<variable>vy</variable>
+								<format>0.00</format>
+								<minimum>-1.0e6</minimum>
+								<maximum>1.0e6</maximum>
+							</numericSpin>
+						</widget>
+						<widget>
+							<placement>
+								<origin>
+									<x>410</x>
+									<y>560</y>
+								</origin>
+								<corner>
+									<x>490</x>
+									<y>583</y>
+								</corner>
+							</placement>
+							<border>
+								<borderLine>simple</borderLine>
+								<borderColor>7F9DB9</borderColor>
+							</border>
+							<colors>
+								<foreground>000000</foreground>
+								<background>FFFFFF</background>
+							</colors>
+							<font>
+								<name>Arial</name>
+								<size>11</size>
+								<bold>false</bold>
+								<italic>false</italic>
+								<underline>false</underline>
+							</font>
+							<numeric>
+								<variable>ax</variable>
+								<format>0.00</format>
+							</numeric>
+						</widget>
+						<widget>
+							<placement>
+								<origin>
+									<x>410</x>
+									<y>590</y>
+								</origin>
+								<corner>
+									<x>490</x>
+									<y>613</y>
+								</corner>
+							</placement>
+							<border>
+								<borderLine>simple</borderLine>
+								<borderColor>7F9DB9</borderColor>
+							</border>
+							<colors>
+								<foreground>000000</foreground>
+								<background>FFFFFF</background>
+							</colors>
+							<font>
+								<name>Arial</name>
+								<size>11</size>
+								<bold>false</bold>
+								<italic>false</italic>
+								<underline>false</underline>
+							</font>
+							<numeric>
+								<variable>ay</variable>
+								<format>0.00</format>
+							</numeric>
+						</widget>
+						<widget>
+							<placement>
+								<origin>
+									<x>320</x>
+									<y>560</y>
+								</origin>
+								<corner>
+									<x>380</x>
+									<y>580</y>
+								</corner>
+							</placement>
+							<colors>
+								<foreground>000000</foreground>
+								<background>FFFFFF</background>
+							</colors>
+							<font>
+								<name>Arial</name>
+								<size>11</size>
+								<bold>false</bold>
+								<italic>false</italic>
+								<underline>false</underline>
+							</font>
+							<numericSpin>
+								<variable>k</variable>
+								<format>0.00</format>
+								<minimum>-1.0e6</minimum>
+								<maximum>1.0e6</maximum>
+							</numericSpin>
+						</widget>
+						<widget>
+							<placement>
+								<origin>
+									<x>320</x>
+									<y>580</y>
+								</origin>
+								<corner>
+									<x>380</x>
+									<y>600</y>
+								</corner>
+							</placement>
+							<colors>
+								<foreground>000000</foreground>
+								<background>FFFFFF</background>
+							</colors>
+							<font>
+								<name>Arial</name>
+								<size>11</size>
+								<bold>false</bold>
+								<italic>false</italic>
+								<underline>false</underline>
+							</font>
+							<numericSpin>
+								<variable>m</variable>
+								<format>0.00</format>
+								<minimum>-1.0e6</minimum>
+								<maximum>1.0e6</maximum>
+							</numericSpin>
 						</widget>
 					</widgets>
 				</interface>
