@@ -512,7 +512,7 @@ Builder = new JS.Class({
 	processAnimationElement: function (node, animation)
 	{
 		console.log("processing animation element");
-		var elmt, placement, colors;
+		var shape, placement, colors;
 		for (var i=0; i<node.childNodes.length; i++) {
 			var nd = node.childNodes[i];
 			
@@ -531,19 +531,24 @@ Builder = new JS.Class({
 				
 				//animationTypes
 				case 'ellipseAnimation':
-					elmt = new Ellipse();
+					shape = new Ellipse();
 					console.log("ellipse");
 					//process data
+					break;
+					
+				case 'lineAnimation':
+					shape = new Line();
+					this.processLine(nd,shape);
 					break;
 				
 				default:
 				break;
 			}
 		}
-		if (elmt != undefined) {
-			elmt.setPlacement(placement);
-			elmt.setColors(colors);
-			animation.addShape(elmt);
+		if (shape != undefined) {
+			shape.setPlacement(placement);
+			shape.setColors(colors);
+			animation.addShape(shape);
 			console.log("adding element");
 		}
 	},
@@ -597,6 +602,32 @@ Builder = new JS.Class({
 			}
 		}
 		return clrs;
+	},
+	
+	processLine: function(node, shape) {
+		for (var i=0; i<node.childNodes.length; i++) {
+			var nd = node.childNodes[i];
+			switch (nd.nodeName) {
+				case 'originArrow':
+					break;
+					
+				case 'endArrow':
+					break;
+					
+				case 'originExpression':
+					var org = this.processDefaultNodesWithExpressions(nd);
+					shape.setOrigin(org);
+					break;
+					
+				case 'endExpression':
+					var end = this.processDefaultNodesWithExpressions(nd);
+					shape.setEnd(end);
+					break;
+					
+				default:
+					break;
+			}
+		}
 	}
 	
 });
