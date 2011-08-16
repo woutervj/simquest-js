@@ -99,12 +99,24 @@ Shape = new JS.Class({
 	
 	setColors: function (clrs)
 	{
-		this.fgRed = clrs['foreground']['red'];
-		this.fgGreen = clrs['foreground']['green'];
-		this.fgBlue = clrs['foreground']['blue'];
-		this.bgRed = clrs['background']['red'];
-		this.bgGreen = clrs['background']['green'];
-		this.bgBlue = clrs['background']['blue'];
+		if (clrs['foreground'] != undefined ) {
+			this.fgRed = clrs['foreground']['red'];
+			this.fgGreen = clrs['foreground']['green'];
+			this.fgBlue = clrs['foreground']['blue'];
+		} else 	{
+			this.fgRed = new ConstantNode(0);
+			this.fgGreen = new ConstantNode(0);
+			this.fgBlue = new ConstantNode(0);
+		}
+		if (clrs['background'] != undefined ) {
+			this.bgRed = clrs['background']['red'];
+			this.bgGreen = clrs['background']['green'];
+			this.bgBlue = clrs['background']['blue'];
+		} else 	{
+			this.bgRed = new ConstantNode(0);
+			this.bgGreen = new ConstantNode(0);
+			this.bgBlue = new ConstantNode(0);
+		}
 	},
 	
 	getSVGElement: function(doc, model)
@@ -209,6 +221,36 @@ Rectangle = new JS.Class(Shape, {
 });
 
 Line = new JS.Class(Shape, {
+
+	getSVGElement: function (doc, model)
+	{
+		var elmt = doc.createElementNS("http://www.w3.org/2000/svg",'line');
+		this.computePlacement(elmt);
+		this.computeColor(elmt);
+		var mySelf = this;
+		this.animation.updaters.push (function(){mySelf.computePlacement(elmt); mySelf.computeColor(elmt);});
+		this.animation.resetters.push (function(){mySelf.computePlacement(elmt); mySelf.computeColor(elmt);});
+		console.log('line added');
+		return elmt;
+	},
+
+	setOrigin: function(a) {
+		this.x1 = a['x'];
+		this.y1 = a['y'];
+	},
+	
+	setEnd: function(a) {
+		this.x2 = a['x'];
+		this.y2 = a['y'];
+	},
+	
+	computePlacement: function(elmt) {
+		elmt.x1.baseVal.value = this.animation.transformX(this.x1.compute());
+		elmt.y1.baseVal.value = this.animation.transformY(this.y1.compute());
+		elmt.x2.baseVal.value = this.animation.transformX(this.x2.compute());
+		elmt.y2.baseVal.value = this.animation.transformY(this.y2.compute());
+	}
+
 });
 
 };
