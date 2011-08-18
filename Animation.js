@@ -119,6 +119,15 @@ Shape = new JS.Class({
 		}
 	},
 	
+	setStrokeWidth: function(anExpression)
+	{
+		if (anExpression != undefined) {
+			this.strokeWidth = anExpression;
+		} else {
+			this.strokeWidth = new ConstantNode (1);
+		}
+	},
+	
 	getSVGElement: function(doc, model)
 	{
 		//subclasses do your work
@@ -144,6 +153,19 @@ Shape = new JS.Class({
 		//colorize the objects
 		elmt.style.fill = this.rgbString(this.bgRed.compute(), this.bgGreen.compute(), this.bgBlue.compute());
 		elmt.style.stroke = this.rgbString(this.fgRed.compute(), this.fgGreen.compute(), this.fgBlue.compute());
+	}, 
+	
+	computeStrokeWidth: function(elmt)
+	{
+		elmt.style.strokeWidth = Math.round(this.strokeWidth.compute()) + "px";
+	},
+	
+	updateShape: function (elmt)
+	{
+		//by default placement, color and strokewidth are updated. subclasses may add more aspects
+		this.computePlacement(elmt);
+		this.computeColor(elmt);
+		this.computeStrokeWidth(elmt);
 	}
 });
 
@@ -152,11 +174,10 @@ Ellipse = new JS.Class(Shape, {
 	getSVGElement: function (doc, model)
 	{
 		var elmt = doc.createElementNS("http://www.w3.org/2000/svg",'ellipse');
-		this.computePlacement(elmt);
-		this.computeColor(elmt);
+		this.updateShape(elmt);
 		var mySelf = this;
-		this.animation.updaters.push (function(){mySelf.computePlacement(elmt); mySelf.computeColor(elmt);});
-		this.animation.resetters.push (function(){mySelf.computePlacement(elmt); mySelf.computeColor(elmt);});
+		this.animation.updaters.push (function(){mySelf.updateShape(elmt);});
+		this.animation.resetters.push (function(){mySelf.updateShape(elmt);});
 		console.log('ellipse added');
 		return elmt;
 	},
@@ -225,11 +246,10 @@ Line = new JS.Class(Shape, {
 	getSVGElement: function (doc, model)
 	{
 		var elmt = doc.createElementNS("http://www.w3.org/2000/svg",'line');
-		this.computePlacement(elmt);
-		this.computeColor(elmt);
+		this.updateShape(elmt);
 		var mySelf = this;
-		this.animation.updaters.push (function(){mySelf.computePlacement(elmt); mySelf.computeColor(elmt);});
-		this.animation.resetters.push (function(){mySelf.computePlacement(elmt); mySelf.computeColor(elmt);});
+		this.animation.updaters.push (function(){mySelf.updateShape(elmt);});
+		this.animation.resetters.push (function(){mySelf.updateShape(elmt);});
 		console.log('line added');
 		return elmt;
 	},
