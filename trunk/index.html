@@ -19,7 +19,7 @@
 	JS.require('JS.Class', function () { initEquations(); initModel(); initInterface(); initAnimation(); initBuilder(); doSimulation()});
 	
 	function doSimulation () {
-		var bldr = new Builder("iso.sqx");
+		var bldr = new Builder("isoplusmatrix.sqx");
 		myModel = bldr.buildModel();
 		myModel.name = "myModel";
 		myInterFace = bldr.buildInterfaces()[0];

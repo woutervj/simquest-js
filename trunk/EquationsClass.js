@@ -272,8 +272,26 @@ Matrix = new JS.Class({
 	},
 	
 	setData: function(anArray) {
-		//a quick way to replace the data. Responsibility (e.g. size reqauirements) is with the programmer.
+		//a quick way to replace the data. Responsibility (e.g. size requirements) is with the calling function.
 		this.data=anArray;
+	},
+	
+	setDataFromString: function(aString) {
+		var cols = aString.split(';');
+		if (cols.length != this.columns) {
+			console.log("wrong number of columns");
+		} else {
+			if (this.rows>1) {
+				for (var i=0; i<cols.length; i++) {
+					var row = cols[i].split(',');
+					for(var j=0; j< row.length; j++) {
+						this.data[i*this.columns + j] = parseFloat(row[j]);
+					}
+				}
+			} else {
+				this.data[i]=parseFloat(cols[i]);
+			}
+		}
 	},
 	
 	cloneSize: function () {

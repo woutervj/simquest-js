@@ -347,7 +347,7 @@ Fy = F * sin phi
 											</background>
 										</colorsExpression>
 										<lineWidthExpression>
-											<literal>1.0</literal>
+											<literal>5.0</literal>
 										</lineWidthExpression>
 										<ellipseAnimation>
 											<startArrow>none</startArrow>

@@ -1,6 +1,7 @@
 var Builder;
 
 function initBuilder () {
+
 Builder = new JS.Class({
 	initialize: function (filename) {
 		if (window.XMLHttpRequest)
@@ -52,6 +53,7 @@ Builder = new JS.Class({
 		for (var i=0; i<aNode.childNodes.length; i++) {
 			var nd = aNode.childNodes[i];
 			if (nd.nodeName == 'modelVariable') {
+				var columns = 1, rows = 1;
 				var varName = '', varValue = 0, varExtName = '', varKind = 'input', varPair;
 				for (var j=0; j<nd.childNodes.length; j++) {
 					var vd = nd.childNodes[j];
@@ -59,8 +61,19 @@ Builder = new JS.Class({
 						case 'name':
 							varName = vd.childNodes[0].nodeValue;
 							break;
+						case 'size':
+							//the value is a matrix
+							rows = parseInt(vd.childNodes[1].childNodes[0].nodeValue);
+							columns = parseInt(vd.childNodes[3].childNodes[0].nodeValue);
+							break;
 						case 'value':
-							varValue = vd.childNodes[0].nodeValue;
+							var valString = vd.childNodes[0].nodeValue;
+							if (columns>1 || rows> 1) {
+								varValue = new Matrix(rows, columns);
+								varValue.setDataFromString(valString);
+							} else {
+								varValue = parseFloat(valString);
+							}
 							break;
 						case 'externalName':
 							varExtName = vd.childNodes[0].nodeValue;
@@ -512,7 +525,7 @@ Builder = new JS.Class({
 	processAnimationElement: function (node, animation)
 	{
 		console.log("processing animation element");
-		var shape, placement, colors;
+		var shape, placement, colors, strokeWidth;
 		for (var i=0; i<node.childNodes.length; i++) {
 			var nd = node.childNodes[i];
 			
@@ -525,8 +538,8 @@ Builder = new JS.Class({
 					colors = this.processColorsExpression(nd);
 					break;
 					
-				case 'lineWithExpression':
-				//todo
+				case 'lineWidthExpression':
+					strokeWidth = this.processExpression(nd.childNodes[1]);
 					break;
 				
 				//animationTypes
@@ -548,6 +561,7 @@ Builder = new JS.Class({
 		if (shape != undefined) {
 			shape.setPlacement(placement);
 			shape.setColors(colors);
+			shape.setStrokeWidth(strokeWidth);
 			animation.addShape(shape);
 			console.log("adding element");
 		}
